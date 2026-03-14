@@ -1,0 +1,51 @@
+services:
+  # Admissions Backend Service
+  - type: web
+    name: admissions-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false # User must provide this in the Render Dashboard
+      - key: JWT_SECRET
+        sync: false # User must provide this in the Render Dashboard
+      - key: JWT_EXPIRE
+        value: 30d
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: admissions-frontend
+          envVarKey: RENDER_EXTERNAL_URL
+
+  # Admissions Frontend Static Site
+  - type: web
+    name: admissions-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    plan: free
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: admissions-backend
+          envVarKey: RENDER_EXTERNAL_URL
+        value: "https://admissions-backend.onrender.com/api" # User may need to replace this manually with the generated backend URL

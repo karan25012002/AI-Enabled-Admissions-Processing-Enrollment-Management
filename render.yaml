@@ -44,8 +44,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: admissions-backend
-          envVarKey: RENDER_EXTERNAL_URL
-        value: "https://admissions-backend.onrender.com/api" # User may need to replace this manually with the generated backend URL
+        sync: false # User must manually provide the Backend URL with /api appended (e.g. https://admissions-backend-xyz.onrender.com/api)
